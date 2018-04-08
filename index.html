@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>MeowReaDer v1.0.1</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/basic.css">
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css">
+</head>
+
+<body>
+    <div id="editor">
+        <div id="container">
+            <el-menu class="el-menu-vertical-demo" style="height: 100vh; width: 20%; position: fixed; left: 0; right: 0; overflow-y: auto;" id="sideMenu" v-loading="loading">
+                <el-submenu v-if="dictorySelected!=''" index="1">
+                    <template slot="title">
+                        <i class="el-icon-location"></i>
+                        <span>{{ splitFolderName | fileLenFormat }}</span>
+                    </template>
+                    <el-menu-item :index="index" v-for="(file, index) in splitFileList" @click="showMDContent(index)" style="width: 100%;">
+                        <i class="el-icon-document"></i>
+                        <span slot="title">{{ file }}</span>
+                    </el-menu-item>
+                </el-submenu>
+            </el-menu>
+            <el-row style="width: 80%; margin-left: 20%; overflow-y: auto; position: fixed; left: 0; top: 0; height:100vh;" id="main">
+                <div id="header" style="width: 100%; height: 25px; text-align: right; font-size: 12px; line-height: 25px;">
+                    <el-dropdown @command="handleCommand">
+                        <i class="el-icon-setting" style="margin-right: 15px"></i>
+                        <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item command="a">資料夾位置</el-dropdown-item>
+                            <el-dropdown-item command="b">軟體版本</el-dropdown-item>
+                            <el-dropdown-item command="c">删除</el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </div>
+                <el-col :span="22" :offset="1">
+                    <div v-html="compiledMarkdown"></div>
+                </el-col>
+            </el-row>
+        </div>
+
+        <el-dialog title="軟體版本" :visible.sync="dialogVersionVisible">
+            <p>Version： <strong>1.0.1</strong></p>
+            <p>Programmer： <strong>music1353 蘇靖軒</strong></p>
+            <p>Copyright © 2018 MeowReaDer. All rights reserved</p>
+        </el-dialog>
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="https://unpkg.com/marked@0.3.6"></script>
+    <script src="https://unpkg.com/lodash@4.16.0"></script>
+    <script src="js/jquery.js"></script>
+    <script>
+        if (typeof module === 'object') {
+            window.jQuery = window.$ = module.exports;
+        };
+
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"></script>
+    <script>
+        var showdown = require('showdown') // md compiler
+        showdown.setFlavor('github');
+
+        // tables extensions
+        showdown.extension('bootstrap-tables', function() {
+            return [{
+                type: "output",
+                filter: function(html, converter, options) {
+                    // parse the html string
+                    var liveHtml = $('<div></div>').html(html);
+                    $('table', liveHtml).each(function() {
+                        var table = $(this);
+                        // table bootstrap classes
+                        table.addClass('table table-striped table-bordered')
+                            // make table responsive
+                            .wrap('<div class="class table-responsive"></div>');
+                    });
+                    return liveHtml.html();
+                }
+            }];
+        });
+
+        showdown.extension('semantic-tables', function() {
+            return [{
+                type: "output",
+                filter: function(html, converter, options) {
+                    // parse the html string
+                    var liveHtml = $('<div></div>').html(html);
+                    $('table', liveHtml).each(function() {
+                        var table = $(this);
+                        // table bootstrap classes
+                        table.addClass('ui selectable celled table')
+                    });
+                    return liveHtml.html();
+                }
+            }];
+        });
+
+        var converter = new showdown.Converter({
+            extensions: ['semantic-tables']
+        })
+
+        var fs = require('fs')
+        var path = require('path')
+        var rd = require('rd')
+        var fileDisplay = require('./utils/fileSelector.js').fileDisplay
+
+        //        window.onload = function() {
+        //            var oBox = document.getElementById('sideMenu');
+        //            var oMain = document.getElementById('main');
+        //            var a = 0;
+        //            oBox.onmousedown = function(ev) {
+        //                var oEvent = ev || event;
+        //                var X = oEvent.clientX;
+        //                var Y = oEvent.clientY;
+        //                var oBoxW = oBox.offsetWidth;
+        //                var oBoxH = oBox.offsetHeight;
+        //                var oBoxL = oBox.offsetLeft;
+        //                var oMainW = oMain.offsetWidth;
+        //                
+        //                if (X <
+        //                    (oBox.offsetLeft + 5)) {
+        //                    a = 'left';
+        //                } else if (X > (oBox.offsetLeft + oBox.offsetWidth - 5)) {
+        //                    a = 'right';
+        //                }
+        //                if (Y <
+        //                    (oBox.offsetTop + 5)) {
+        //                    a = 'top';
+        //                } else if (Y > (oBox.offsetTop + oBoxH - 5)) {
+        //                    a = 'bottom';
+        //                }
+        //                document.onmousemove = function(ev) {
+        //                    var oEvent = ev || event;
+        //                    var XX = oEvent.clientX;
+        //                    var YY = oEvent.clientY;
+        //                    if (a == 'right') {
+        //                        oBox.style.width = oBoxW + (XX - X) + 'px';
+        //                        // oMain.style.width = oMainW - (XX - X) + 'px';
+        //                        console.log(oBox.style.width);
+        //                        // console.log(oMain.style.width);
+        //                    } else if (a == 'left') {
+        //                        oBox.style.width = oBoxW + (X - XX) + 'px';
+        //                        oBox.style.left = XX - X + oBoxL - 5 + 'px';
+        //                    }
+        //                };
+        //                document.onmouseup = function() {
+        //                    document.onmousedown = null;
+        //                    document.onmousemove = null;
+        //                };
+        //            };
+        //        };
+
+        new Vue({
+            el: '#editor',
+            data() {
+                return {
+                    input: '# hello',
+                    loading: false,
+                    fileList: [],
+                    dictorySelected: '',
+                    dialogVersionVisible: false
+                }
+            },
+            computed: {
+                compiledMarkdown() {
+                    return converter.makeHtml(this.input)
+                },
+                splitFolderName() {
+                    return this.dictorySelected.split("/").pop()
+                },
+                splitFileList() {
+                    var splitFileList = [];
+                    this.fileList.forEach((file) => {
+                        var fName = file.split("/").pop();
+                        splitFileList.push(fName);
+                    });
+                    return splitFileList
+                }
+            },
+            filters: {
+                fileLenFormat(value) {
+                    if (value.length > 10) {
+                        return value.substring(0, 11) + '...'
+                    }
+                }
+            },
+            mounted() {
+                document.getElementById("sideMenu").addEventListener('scroll', this.menu);
+
+                $.fn.scrollUnique = function() {
+                    return $(this).each(function() {
+                        var eventType = 'mousewheel';
+                        if (document.mozHidden !== undefined) {
+                            eventType = 'DOMMouseScroll';
+                        }
+                        $(this).on(eventType, function(event) {
+                            // 一些数据
+                            var scrollTop = this.scrollTop,
+                                scrollHeight = this.scrollHeight,
+                                height = this.clientHeight;
+
+                            var delta = (event.originalEvent.wheelDelta) ? event.originalEvent.wheelDelta : -(event.originalEvent.detail || 0);
+
+                            if ((delta > 0 && scrollTop <= delta) || (delta < 0 && scrollHeight - height - scrollTop <= -1 * delta)) {
+                                // IE浏览器下滚动会跨越边界直接影响父级滚动，因此，临界时候手动边界滚动定位
+                                this.scrollTop = delta > 0 ? 0 : scrollHeight;
+                                // 向上滚 || 向下滚
+                                event.preventDefault();
+                            }
+                        });
+                    });
+                };
+
+            },
+            methods: {
+                menu() {
+                    $('#sideMenu').scrollUnique();
+                },
+                handleCommand(command) {
+                    if (command == "a") {
+                        this.showFileDialog();
+                    } else if (command == "b") {
+                        this.dialogVersionVisible = true;
+                    }
+                },
+                showFileDialog() {
+                    const dialog = require('electron').remote.dialog
+                    dialog.showOpenDialog({
+                        properties: ['openDirectory']
+                    }, (filename) => {
+                        if (filename.length === 1) {
+                            this.dictorySelected = filename[0]
+                            this.selectMDFiles(this.dictorySelected)
+                        }
+                    })
+                },
+                selectMDFiles(filePath) {
+                    var self = this;
+                    this.loading = true;
+                    rd.eachFileFilterSync(filePath, /\.md$/, function(f, s) {
+                        self.fileList.push(f);
+                    });
+                    this.loading = false;
+                },
+                showMDContent(index) {
+                    fs.readFile(this.fileList[index], (err, data) => {
+                        if (err) {
+                            throw err;
+                        } else {
+                            this.input = data.toString();
+                        }
+                    });
+                },
+            }
+        })
+
+    </script>
+    <script>
+        // You can also require other files to run in this process
+        require('./renderer.js')
+
+    </script>
+</body>
+
+</html>
