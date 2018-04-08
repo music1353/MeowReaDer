@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.9/css/all.css" integrity="sha384-5SOiIsAziJl6AWe0HWRKTXlfcSHKmYV4RBF18PPJ173Kzn7jzMyFuTtk8JA7QQG1" crossorigin="anonymous">
 </head>
 
 <body>
@@ -17,17 +18,17 @@
             <el-menu class="el-menu-vertical-demo" style="height: 100vh; width: 20%; position: fixed; left: 0; right: 0; overflow-y: auto;" id="sideMenu" v-loading="loading">
                 <el-submenu v-if="dictorySelected!=''" index="1">
                     <template slot="title">
-                        <i class="el-icon-location"></i>
+                        <i class="fas fa-folder" style="margin-right: 10px;"></i>
                         <span>{{ splitFolderName | fileLenFormat }}</span>
                     </template>
                     <el-menu-item :index="index" v-for="(file, index) in splitFileList" @click="showMDContent(index)" style="width: 100%;">
                         <i class="el-icon-document"></i>
-                        <span slot="title">{{ file }}</span>
+                        <span slot="title">{{ file | fileNameFormat }}</span>
                     </el-menu-item>
                 </el-submenu>
             </el-menu>
             <el-row style="width: 80%; margin-left: 20%; overflow-y: auto; position: fixed; left: 0; top: 0; height:100vh;" id="main">
-                <div id="header" style="width: 100%; height: 25px; text-align: right; font-size: 12px; line-height: 25px;">
+                <div id="header" style="width: 80%; height: 25px; text-align: right; font-size: 12px; line-height: 25px; position: fixed; top: 0; left: 20%;">
                     <el-dropdown @command="handleCommand">
                         <i class="el-icon-setting" style="margin-right: 15px"></i>
                         <el-dropdown-menu slot="dropdown">
@@ -37,7 +38,7 @@
                         </el-dropdown-menu>
                     </el-dropdown>
                 </div>
-                <el-col :span="22" :offset="1">
+                <el-col :span="22" :offset="1" style="margin-top: 25px;">
                     <div v-html="compiledMarkdown"></div>
                 </el-col>
             </el-row>
@@ -190,6 +191,9 @@
                     } else {
                         return value
                     }
+                },
+                fileNameFormat(value) {
+                    return value.split('.')[0];
                 }
             },
             mounted() {
@@ -202,7 +206,6 @@
                             eventType = 'DOMMouseScroll';
                         }
                         $(this).on(eventType, function(event) {
-                            // 一些数据
                             var scrollTop = this.scrollTop,
                                 scrollHeight = this.scrollHeight,
                                 height = this.clientHeight;
@@ -210,9 +213,9 @@
                             var delta = (event.originalEvent.wheelDelta) ? event.originalEvent.wheelDelta : -(event.originalEvent.detail || 0);
 
                             if ((delta > 0 && scrollTop <= delta) || (delta < 0 && scrollHeight - height - scrollTop <= -1 * delta)) {
-                                // IE浏览器下滚动会跨越边界直接影响父级滚动，因此，临界时候手动边界滚动定位
+                                // IE瀏覽器下滾動會跨越邊界直接影響父級滾動，因此，臨界時候手動邊界滾動定位
                                 this.scrollTop = delta > 0 ? 0 : scrollHeight;
-                                // 向上滚 || 向下滚
+                                // 向上滾 || 向下滾
                                 event.preventDefault();
                             }
                         });
