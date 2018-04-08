@@ -187,6 +187,8 @@
                 fileLenFormat(value) {
                     if (value.length > 10) {
                         return value.substring(0, 11) + '...'
+                    } else {
+                        return value
                     }
                 }
             },
@@ -241,6 +243,7 @@
                     })
                 },
                 selectMDFiles(filePath) {
+                    this.fileList = [];
                     var self = this;
                     this.loading = true;
                     rd.eachFileFilterSync(filePath, /\.md$/, function(f, s) {
