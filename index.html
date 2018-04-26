@@ -45,7 +45,7 @@
         </div>
 
         <el-dialog id="versionDialog" title="軟體版本" :visible.sync="dialogVersionVisible">
-            <p>Version： <strong>1.0.1</strong></p>
+            <p>Version： <strong>1.0.2</strong></p>
             <p>Programmer： <strong>music1353 蘇靖軒</strong></p>
             <p>Copyright © 2018 MeowReaDer. All rights reserved</p>
         </el-dialog>
@@ -65,7 +65,7 @@
 
     </script>
     <script src="node_modules/element-ui/lib/index.js"></script>
-    <script type="text/javascript" src="static/mathjax/mathjax.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&delayStartupUntil=configured"></script>
     <script type="text/javascript" src="static/mermaid/mermaid.min.js"></script>
     <script>
         var showdown = require('showdown') // md compiler
@@ -171,7 +171,18 @@
             el: '#editor',
             data() {
                 return {
-                    input: '# hello',
+                    input: `# Welcome MeowReader
+
+* 方便、快速瀏覽 Markdown 檔案
+* 支持 LaTeX 數學運算語法（需連上網路）
+
+
+
+# 操作說明
+
+1. 滑鼠移動到右上角的齒輪
+2. 選擇欲瀏覽的資料夾位置（會將選定資料夾以下的所有md檔都匯入）
+3. 享受文件 =v=`,
                     loading: false,
                     fileList: [],
                     dictorySelected: '',
