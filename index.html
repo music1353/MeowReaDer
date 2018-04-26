@@ -3,19 +3,20 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>MeowReaDer v1.0.1</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
-    <link rel="stylesheet" href="css/basic.css">
-    <link rel="stylesheet" href="css/index.css">
-    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.9/css/all.css" integrity="sha384-5SOiIsAziJl6AWe0HWRKTXlfcSHKmYV4RBF18PPJ173Kzn7jzMyFuTtk8JA7QQG1" crossorigin="anonymous">
+    <title>MeowReaDer v1.0.2</title>
+    <link rel="stylesheet" href="static/css/basic.css">
+    <link rel="stylesheet" href="static/css/index.css">
+    <link rel="stylesheet" href="node_modules/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="static/semantic-ui/semantic.min.css">
+    <link rel="stylesheet" href="static/fontawesome/web-fonts-with-css/css/fontawesome-all.min.css">
+    <link rel="stylesheet" href="static/css/foundation.min.css">
+    <link rel="stylesheet" href="static/mermaid/mermaid.css">
 </head>
 
 <body>
     <div id="editor">
-        <div id="container">
-            <el-menu class="el-menu-vertical-demo" style="height: 100vh; width: 20%; position: fixed; left: 0; right: 0; overflow-y: auto;" id="sideMenu" v-loading="loading">
+        <div class="container">
+            <el-menu id="sideMenu" v-loading="loading">
                 <el-submenu v-if="dictorySelected!=''" index="1">
                     <template slot="title">
                         <i class="fas fa-folder" style="margin-right: 10px;"></i>
@@ -27,14 +28,13 @@
                     </el-menu-item>
                 </el-submenu>
             </el-menu>
-            <el-row style="width: 80%; margin-left: 20%; overflow-y: auto; position: fixed; left: 0; top: 0; height:100vh;" id="main">
-                <div id="header" style="width: 80%; height: 25px; text-align: right; font-size: 12px; line-height: 25px; position: fixed; top: 0; left: 20%;">
+            <el-row id="main">
+                <div id="header">
                     <el-dropdown @command="handleCommand">
                         <i class="el-icon-setting" style="margin-right: 15px"></i>
                         <el-dropdown-menu slot="dropdown">
                             <el-dropdown-item command="a">資料夾位置</el-dropdown-item>
                             <el-dropdown-item command="b">軟體版本</el-dropdown-item>
-                            <el-dropdown-item command="c">删除</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
                 </div>
@@ -44,48 +44,34 @@
             </el-row>
         </div>
 
-        <el-dialog title="軟體版本" :visible.sync="dialogVersionVisible">
+        <el-dialog id="versionDialog" title="軟體版本" :visible.sync="dialogVersionVisible">
             <p>Version： <strong>1.0.1</strong></p>
             <p>Programmer： <strong>music1353 蘇靖軒</strong></p>
             <p>Copyright © 2018 MeowReaDer. All rights reserved</p>
         </el-dialog>
 
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script src="static/vue/vue.js"></script>
+    <script src="static/element-ui/index.js"></script>
+<!--
     <script src="https://unpkg.com/marked@0.3.6"></script>
     <script src="https://unpkg.com/lodash@4.16.0"></script>
-    <script src="js/jquery.js"></script>
+-->
+    <script src="static/js/jquery.js"></script>
     <script>
         if (typeof module === 'object') {
             window.jQuery = window.$ = module.exports;
         };
 
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"></script>
+    <script src="node_modules/element-ui/lib/index.js"></script>
+    <script type="text/javascript" src="static/mathjax/mathjax.js"></script>
+    <script type="text/javascript" src="static/mermaid/mermaid.min.js"></script>
     <script>
         var showdown = require('showdown') // md compiler
         showdown.setFlavor('github');
 
         // tables extensions
-        showdown.extension('bootstrap-tables', function() {
-            return [{
-                type: "output",
-                filter: function(html, converter, options) {
-                    // parse the html string
-                    var liveHtml = $('<div></div>').html(html);
-                    $('table', liveHtml).each(function() {
-                        var table = $(this);
-                        // table bootstrap classes
-                        table.addClass('table table-striped table-bordered')
-                            // make table responsive
-                            .wrap('<div class="class table-responsive"></div>');
-                    });
-                    return liveHtml.html();
-                }
-            }];
-        });
-
         showdown.extension('semantic-tables', function() {
             return [{
                 type: "output",
@@ -102,14 +88,38 @@
             }];
         });
 
+        // LaTeX extensions
+        showdown.extension('mathjax', function() {
+            return [{
+                type: 'lang',
+                filter: function(text) {
+                    $.getScript('https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&delayStartupUntil=configured', function() {
+                        MathJax.Hub.Config({
+                            tex2jax: {
+                                inlineMath: [
+                                    ["$", "$"]
+                                ],
+                                displayMath: [
+                                    ["$$", "$$"]
+                                ]
+                            }
+                        });
+                        MathJax.Hub.Configured();
+                        MathJax.Hub.Queue(['Typeset', MathJax.Hub]);
+                    });
+
+                    return text;
+                }
+            }];
+        });
+
         var converter = new showdown.Converter({
-            extensions: ['semantic-tables']
+            extensions: ['semantic-tables', 'mathjax']
         })
 
         var fs = require('fs')
         var path = require('path')
         var rd = require('rd')
-        var fileDisplay = require('./utils/fileSelector.js').fileDisplay
 
         //        window.onload = function() {
         //            var oBox = document.getElementById('sideMenu');
@@ -196,37 +206,7 @@
                     return value.split('.')[0];
                 }
             },
-            mounted() {
-                document.getElementById("sideMenu").addEventListener('scroll', this.menu);
-
-                $.fn.scrollUnique = function() {
-                    return $(this).each(function() {
-                        var eventType = 'mousewheel';
-                        if (document.mozHidden !== undefined) {
-                            eventType = 'DOMMouseScroll';
-                        }
-                        $(this).on(eventType, function(event) {
-                            var scrollTop = this.scrollTop,
-                                scrollHeight = this.scrollHeight,
-                                height = this.clientHeight;
-
-                            var delta = (event.originalEvent.wheelDelta) ? event.originalEvent.wheelDelta : -(event.originalEvent.detail || 0);
-
-                            if ((delta > 0 && scrollTop <= delta) || (delta < 0 && scrollHeight - height - scrollTop <= -1 * delta)) {
-                                // IE瀏覽器下滾動會跨越邊界直接影響父級滾動，因此，臨界時候手動邊界滾動定位
-                                this.scrollTop = delta > 0 ? 0 : scrollHeight;
-                                // 向上滾 || 向下滾
-                                event.preventDefault();
-                            }
-                        });
-                    });
-                };
-
-            },
             methods: {
-                menu() {
-                    $('#sideMenu').scrollUnique();
-                },
                 handleCommand(command) {
                     if (command == "a") {
                         this.showFileDialog();
@@ -265,6 +245,37 @@
                 },
             }
         })
+
+    </script>
+    <script>
+        const {
+            remote
+        } = require('electron')
+        const {
+            Menu,
+            MenuItem
+        } = remote
+
+        const menu = new Menu()
+        menu.append(new MenuItem({
+            label: 'MenuItem1',
+            click() {
+                console.log('item 1 clicked')
+            }
+        }))
+        menu.append(new MenuItem({
+            type: 'separator'
+        }))
+        menu.append(new MenuItem({
+            label: 'MenuItem2',
+            type: 'checkbox',
+            checked: true
+        }))
+
+        window.addEventListener('contextmenu', (e) => {
+            e.preventDefault()
+            menu.popup(remote.getCurrentWindow())
+        }, false)
 
     </script>
     <script>
