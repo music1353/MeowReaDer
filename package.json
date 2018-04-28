@@ -1,11 +1,11 @@
 {
     "name": "MeowReaDer",
-    "version": "1.0.2",
+    "version": "1.0.4",
     "description": "A minimal Electron application",
     "main": "main.js",
     "scripts": {
         "start": "electron .",
-        "packager_mac": "electron-packager . MeowReaDer --overwrite --platform=darwin --arch=x64 --version=1.8.4 --asar=true --ignore=node_modules/electron-* --prune",
+        "packager_mac": "electron-packager . MeowReaDer --overwrite --platform=darwin --arch=x64 --version=1.8.4 --asar=true  --icon= --ignore=node_modules/electron-* --prune",
         "packager_win32": "electron-packager . MeowReaDer --overwrite --platform=win32 --arch=x64 --version=1.8.4 --asar=true --ignore=node_modules/electron-* --prune",
         "packager_linux": "electron-packager . MeowReaDer --overwrite --platform=linux --arch=x64 --version=1.8.4 --asar=true --ignore=node_modules/electron-* --prune",
         "builder_mac": "electron-builder --mac"
@@ -30,7 +30,11 @@
         "copyright": "Music 蘇靖軒",
         "directories": {
             "output": "builder_MeowReaDer"
-        }
+        },
+        "asar": true,
+        "compression": "store",
+        "icon": "/Users/s960405s/Desktop/icon.icns",
+        "electronVersion": "1.8.4"
     },
     "dependencies": {
         "element-ui": "^2.3.6",

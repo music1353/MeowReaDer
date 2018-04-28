@@ -1,7 +1,9 @@
 # Welcome MeowReader
 
 * 方便、快速瀏覽 Markdown 檔案
-* 支持 LaTeX 數學運算語法（需連上網路）
+* 支持 LaTeX 數學
+* Project Github：[MoewReaDer](https://github.com/music1353/MeowReaDer)
+
 
 
 

@@ -3,13 +3,14 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>MeowReaDer v1.0.2</title>
+    <title>MeowReaDer v1.0.4</title>
     <link rel="stylesheet" href="static/css/basic.css">
     <link rel="stylesheet" href="static/css/index.css">
     <link rel="stylesheet" href="node_modules/element-ui/lib/theme-chalk/index.css">
-    <link rel="stylesheet" href="static/semantic-ui/semantic.min.css">
+<!--    <link rel="stylesheet" href="static/semantic-ui/semantic.min.css">-->
     <link rel="stylesheet" href="static/fontawesome/web-fonts-with-css/css/fontawesome-all.min.css">
-    <link rel="stylesheet" href="static/css/foundation.min.css">
+<!--    <link rel="stylesheet" href="static/css/foundation.min.css">-->
+    <link rel="stylesheet" href="static/markdown-style/github.css">
     <link rel="stylesheet" href="static/mermaid/mermaid.css">
 </head>
 
@@ -45,14 +46,13 @@
         </div>
 
         <el-dialog id="versionDialog" title="軟體版本" :visible.sync="dialogVersionVisible">
-            <p>Version： <strong>1.0.2</strong></p>
+            <p>Version： <strong>1.0.3</strong></p>
             <p>Programmer： <strong>music1353 蘇靖軒</strong></p>
             <p>Copyright © 2018 MeowReaDer. All rights reserved</p>
         </el-dialog>
 
     </div>
     <script src="static/vue/vue.js"></script>
-    <script src="static/element-ui/index.js"></script>
 <!--
     <script src="https://unpkg.com/marked@0.3.6"></script>
     <script src="https://unpkg.com/lodash@4.16.0"></script>
@@ -68,6 +68,7 @@
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&delayStartupUntil=configured"></script>
     <script type="text/javascript" src="static/mermaid/mermaid.min.js"></script>
     <script>
+        const {shell} = require('electron')
         var showdown = require('showdown') // md compiler
         showdown.setFlavor('github');
 
@@ -114,7 +115,19 @@
         });
 
         var converter = new showdown.Converter({
-            extensions: ['semantic-tables', 'mathjax']
+            extensions: ['mathjax'],
+            omitExtraWLInCodeBlocks: true,
+            parseImgDimensions: true,
+            simplifiedAutoLink: true,
+            literalMidWordUnderscores: true,
+            strikethrough: true,
+            tables: true,
+            ghCodeBlocks: true,
+            tasklists: true,
+            smoothLivePreview: true,
+            disableForced4SpacesIndentedSublists: true,
+            ghCompatibleHeaderId: true,
+            encodeEmails: true,
         })
 
         var fs = require('fs')
@@ -166,6 +179,13 @@
         //                };
         //            };
         //        };
+        
+        
+        // open links externally by default
+        $(document).on('click', 'a[href^="http"]', function(event) {
+            event.preventDefault();
+            shell.openExternal(this.href);
+        });
 
         new Vue({
             el: '#editor',
@@ -175,7 +195,7 @@
 
 * 方便、快速瀏覽 Markdown 檔案
 * 支持 LaTeX 數學運算語法（需連上網路）
-
+* Project Github：[MoewReaDer](https://github.com/music1353/MeowReaDer)
 
 
 # 操作說明
@@ -189,6 +209,10 @@
                     dialogVersionVisible: false
                 }
             },
+            // TODO 熱更新
+//            created() {
+//                
+//            },
             computed: {
                 compiledMarkdown() {
                     return converter.makeHtml(this.input)
@@ -218,6 +242,10 @@
                 }
             },
             methods: {
+                // TODO 熱更新
+//                checkVersion() {
+//                    
+//                },
                 handleCommand(command) {
                     if (command == "a") {
                         this.showFileDialog();
@@ -250,43 +278,18 @@
                         if (err) {
                             throw err;
                         } else {
-                            this.input = data.toString();
+                            // 修正>出現後的list跑版問題
+                            var context = data.toString().replace(/>/g, ' >');
+                            this.input = context;
                         }
                     });
                 },
+                openUrl(link) {
+                    shell.openExternal(link);
+                    console.log(link);
+                }
             }
         })
-
-    </script>
-    <script>
-        const {
-            remote
-        } = require('electron')
-        const {
-            Menu,
-            MenuItem
-        } = remote
-
-        const menu = new Menu()
-        menu.append(new MenuItem({
-            label: 'MenuItem1',
-            click() {
-                console.log('item 1 clicked')
-            }
-        }))
-        menu.append(new MenuItem({
-            type: 'separator'
-        }))
-        menu.append(new MenuItem({
-            label: 'MenuItem2',
-            type: 'checkbox',
-            checked: true
-        }))
-
-        window.addEventListener('contextmenu', (e) => {
-            e.preventDefault()
-            menu.popup(remote.getCurrentWindow())
-        }, false)
 
     </script>
     <script>
