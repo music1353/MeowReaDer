@@ -5,7 +5,7 @@
     "main": "main.js",
     "scripts": {
         "start": "electron .",
-        "packager_mac": "electron-packager . MeowReaDer --overwrite --platform=darwin --arch=x64 --version=1.8.4 --asar=true  --icon= --ignore=node_modules/electron-* --prune",
+        "packager_mac": "electron-packager . MeowReaDer --overwrite --platform=darwin --arch=x64 --version=1.8.4 --asar=true  --icon=/Users/s960405s/Desktop/104icon.icns --ignore=node_modules/electron-* --prune",
         "packager_win32": "electron-packager . MeowReaDer --overwrite --platform=win32 --arch=x64 --version=1.8.4 --asar=true --ignore=node_modules/electron-* --prune",
         "packager_linux": "electron-packager . MeowReaDer --overwrite --platform=linux --arch=x64 --version=1.8.4 --asar=true --ignore=node_modules/electron-* --prune",
         "builder_mac": "electron-builder --mac"
@@ -32,8 +32,8 @@
             "output": "builder_MeowReaDer"
         },
         "asar": true,
-        "compression": "store",
-        "icon": "/Users/s960405s/Desktop/icon.icns",
+        "compression": "maximum",
+        "icon": "/Users/s960405s/Desktop/104icon.icns",
         "electronVersion": "1.8.4"
     },
     "dependencies": {

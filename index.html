@@ -46,7 +46,7 @@
         </div>
 
         <el-dialog id="versionDialog" title="軟體版本" :visible.sync="dialogVersionVisible">
-            <p>Version： <strong>1.0.3</strong></p>
+            <p>Version： <strong>1.0.4</strong></p>
             <p>Programmer： <strong>music1353 蘇靖軒</strong></p>
             <p>Copyright © 2018 MeowReaDer. All rights reserved</p>
         </el-dialog>
@@ -283,6 +283,9 @@
                             this.input = context;
                         }
                     });
+                    
+                    // 回到頁面頂部
+                    $('#main').scrollTop(0);
                 },
                 openUrl(link) {
                     shell.openExternal(link);
